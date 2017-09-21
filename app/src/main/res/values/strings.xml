@@ -23,7 +23,7 @@
     <string name="status">Status</string>
     <string name="llsWrite">LinkLossAlert</string>
     <string name="iasWrite">ImmediateAlert</string>
-    <string name="scanning">Scanning for devices...</string>
+    <string name="scanning">Scanning for devices…</string>
     <string name="no_ble_devices">No LE devices found.</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Not connected</string>
@@ -64,7 +64,7 @@
     <string name="scan">Scan</string>
     <string name="cancel">Cancel</string>
      <!--  DeviceListActivityBT2 -->
-    <string name="scanning_bt2">scanning for devices...</string>
+    <string name="scanning_bt2">scanning for devices…</string>
     <string name="select_device_bt2">select a device to connect</string>
     <string name="none_paired">No devices have been paired</string>
     <string name="none_found">No devices found</string>
@@ -79,6 +79,13 @@
     <string name="rton">RTOn</string>
     <string name="unload">Unload</string>
     <string name="stop">Stop</string>
+    <string name="battery">电量：</string>
+    <string name="read_battery">读取电量</string>
+    <string name="onoff">OnOff</string>
+    <string name="upload">upload</string>
+    <string name="anti_thief">防丢：</string>
+    <string name="phone">电话：</string>
+    <string name="msg">短信：</string>
 
     <string-array name="sensor_interface">
         <item>None</item>

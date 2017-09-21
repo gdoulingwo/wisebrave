@@ -2,6 +2,9 @@ package link_work.wisebrave.BleMsg;
 
 import android.util.Log;
 
+/*
+* 获取手环当前的电量
+* */
 public class BleCmd03_getPower extends BaseBleMessage {
     /**
      * 例如手机只需要向手环发送：
@@ -9,8 +12,6 @@ public class BleCmd03_getPower extends BaseBleMessage {
      * 手环如果成功返回：
      * 68  83  0100 00 6c  16
      */
-
-//	byte cmd_close_ring = 0x01;
     public static byte mTheCmd = 0x03;
 
     public byte[] getPower() {

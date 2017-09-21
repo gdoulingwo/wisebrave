@@ -40,7 +40,7 @@ import java.util.UUID;
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
  */
-public class UartService extends Service {
+public class UARTService extends Service {
     public final static String ACTION_GATT_CONNECTED =
             "com.hch.ble.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED =
@@ -67,7 +67,7 @@ public class UartService extends Service {
     public static final UUID TX_CHAR_UUID = UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb");
     public static final UUID HR_SERVICE_UUID = UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb");
     public static final UUID HR_CHAR_UUID = UUID.fromString("00002a38-0000-1000-8000-00805f9b34fb");
-    private final static String TAG = UartService.class.getSimpleName();
+    private final static String TAG = UARTService.class.getSimpleName();
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
@@ -351,8 +351,8 @@ public class UartService extends Service {
      * @return
      */
     public void enableTXNotification() {
-    	/*
-    	if (mBluetoothGatt == null) {
+        /*
+        if (mBluetoothGatt == null) {
     		showMessage("mBluetoothGatt null" + mBluetoothGatt);
     		broadcastUpdate(DEVICE_DOES_NOT_SUPPORT);
     		return;
@@ -414,8 +414,8 @@ public class UartService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        UartService getService() {
-            return UartService.this;
+        UARTService getService() {
+            return UARTService.this;
         }
     }
 }

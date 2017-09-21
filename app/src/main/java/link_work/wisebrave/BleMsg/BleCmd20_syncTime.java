@@ -3,6 +3,9 @@ package link_work.wisebrave.BleMsg;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+/*
+* 手环和手机同步时间
+* */
 public class BleCmd20_syncTime extends BaseBleMessage {
 
 
@@ -15,7 +18,7 @@ public class BleCmd20_syncTime extends BaseBleMessage {
     public static byte mTheCmd = 0x20;
 
     public byte[] dealBleResponse(byte[] notifyData, int dataLen) {
-//		syncCurrentTime();
+        syncCurrentTime();
         return null;
     }
 
