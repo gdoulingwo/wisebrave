@@ -1,5 +1,6 @@
-package link_work.wisebrave;
+package link_work.wisebrave.BleMsg;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 
@@ -18,6 +19,7 @@ public abstract class BaseBleMessage {
     private byte msg_tail = 0x16;
 
     //	public abstract void backToDevices();
+    @NonNull
     public static String byteArrHexToString(byte[] b) {
         String ret = "";
 
@@ -74,8 +76,7 @@ public abstract class BaseBleMessage {
     public byte[] setMessageByteData(byte cmd, byte[] data, int len) {
         msg_cmd = cmd;
 
-        //if (data != null)
-        {
+        if (data != null) {
             msg_data_len = len;
             msg_data = data;
         }

@@ -1,18 +1,28 @@
-package link_work.wisebrave;
+package link_work.wisebrave.BleMsg;
 
 import android.util.Log;
+
+import link_work.wisebrave.demo;
 
 
 public class BleCmd05_RemindOnOff extends BaseBleMessage {
 
     public static final String TAG = "tixing";
     /**
-     *
+     * 蓝牙自动关闭广播
      */
     public static final byte mTheCmd = 0x05;
-
+    /*
+    * 防丢提醒
+    * */
     public static final int REMIND_TYPE_LOST = 1;
+    /*
+    * 短信提醒
+    * */
     public static final int REMIND_TYPE_SMS = 2;
+    /*
+    * 来电提醒
+    * */
     public static final int REMIND_TYPE_PHONE = 3;
 
     public byte[] switchRemind(int remindType, boolean remindOnOff) {
@@ -20,19 +30,19 @@ public class BleCmd05_RemindOnOff extends BaseBleMessage {
         data[0] = 0x00;
         switch (remindType) {
             case REMIND_TYPE_LOST: {
-                // LOST
+                // LOST 防丢提醒
                 data[1] = 0x01;
                 data[2] = (byte) (remindOnOff ? 0x01 : 0x00);
                 return setMessageByteData(mTheCmd, data, data.length);
             }
             case REMIND_TYPE_SMS: {
-                // sms
+                // sms 短信提醒
                 data[1] = 0x02;
                 data[2] = (byte) (remindOnOff ? 0x01 : 0x00);
                 return setMessageByteData(mTheCmd, data, data.length);
             }
             case REMIND_TYPE_PHONE: {
-                // phone
+                // phone 来电提醒
                 data[1] = 0x03;
                 data[2] = (byte) (remindOnOff ? 0x01 : 0x00);
                 return setMessageByteData(mTheCmd, data, data.length);
@@ -45,8 +55,8 @@ public class BleCmd05_RemindOnOff extends BaseBleMessage {
     }
 
     /**
-     * @param type    1：防丢提醒        2：短信提醒        3：来电提醒
-     * @return 0：关              1：开
+     * @param type 1：防丢提醒 2：短信提醒 3：来电提醒
+     * @return 0：关  1：开
      */
     public byte[] readRemindStatus(int type) {
         byte[] data = new byte[2];
@@ -72,11 +82,10 @@ public class BleCmd05_RemindOnOff extends BaseBleMessage {
     /**
      * 存入缓存
      *
-     * @param notifyData
-     * @param dataLen
+     * @param notifyData 提醒数据内容
+     * @param dataLen 提醒数据内容的长度
      */
     public byte[] dealBleResponse(byte[] notifyData, int dataLen) {
-        // TODO Auto-generated method stub
         if (dataLen <= 2) {
             return null;
         }
@@ -86,15 +95,15 @@ public class BleCmd05_RemindOnOff extends BaseBleMessage {
 
         switch (type) {
             case REMIND_TYPE_LOST:
-                Log.d("", "===========防丢状态：" + isOpened);
+                Log.d("BEL_status", "===========防丢状态：" + isOpened);
                 demo.hrDK.mToggleButtonLose.setChecked(isOpened);
                 break;
             case REMIND_TYPE_SMS:
-                Log.d("", "===========短信状态：" + isOpened);
+                Log.d("BEL_status", "===========短信状态：" + isOpened);
                 demo.hrDK.mToggleButtonSms.setChecked(isOpened);
                 break;
             case REMIND_TYPE_PHONE:
-                Log.d("", "===========电话状态：" + isOpened);
+                Log.d("BEL_status", "===========电话状态：" + isOpened);
                 demo.hrDK.mToggleButtonCall.setChecked(isOpened);
                 break;
             default:

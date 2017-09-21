@@ -47,6 +47,10 @@ import android.widget.ToggleButton;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import link_work.wisebrave.BleMsg.BaseBleMessage;
+import link_work.wisebrave.BleMsg.BleCmd03_getPower;
+import link_work.wisebrave.BleMsg.BleCmd05_RemindOnOff;
+
 public class demo extends Activity implements
         RadioGroup.OnCheckedChangeListener, OnItemSelectedListener {
     public static final String TAG = "nRFUART";
@@ -79,10 +83,10 @@ public class demo extends Activity implements
     boolean bStartHRTest = false;
     boolean bStartHRTestOnOff = false;
     int iStableTime = 0;
-    ToggleButton mToggleButtonLose;
-    ToggleButton mToggleButtonSms;
+    public ToggleButton mToggleButtonLose;
+    public ToggleButton mToggleButtonSms;
 
-    ToggleButton mToggleButtonCall;
+    public ToggleButton mToggleButtonCall;
     int time_flag = 0;
     TextView mRemoteRssiVal;
     RadioGroup mRg;
@@ -397,16 +401,14 @@ public class demo extends Activity implements
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case UPDATE_MESSAGE:
-                        // mTextView.setText("HR :" + iHR + "/T :" + iStableTime +
-                        // "/Ready Flag : " + iReadyFlag + "/Motion Flag : " +
-                        // iMotionFlag+ "/Touch Flag : " + iTouchFlag );
-                        //mTextView.setText("HR :" + iHR + "(" + cur_HR + ")");
+                        mTextView.setText("HR :" + iHR + "(" + cur_HR + ")");
                         break;
                 }
                 super.handleMessage(msg);
             }
         };
 
+        // 获取手环当前的电量
         mButtonPower.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -471,12 +473,14 @@ public class demo extends Activity implements
                         // class, with popup windows that scan for devices
 
                         try {
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     } else {
                         // Disconnect button pressed
                         try {
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -569,8 +573,6 @@ public class demo extends Activity implements
         if (tx_data == null) {
             return;
         }
-
-        int len = tx_data.length;
 
         if (mUartService == null) {
             return;

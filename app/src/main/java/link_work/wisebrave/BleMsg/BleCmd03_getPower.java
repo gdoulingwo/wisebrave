@@ -1,4 +1,4 @@
-package link_work.wisebrave;
+package link_work.wisebrave.BleMsg;
 
 import android.util.Log;
 

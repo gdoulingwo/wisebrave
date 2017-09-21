@@ -2,6 +2,12 @@ package link_work.wisebrave;
 
 import android.util.Log;
 
+import link_work.wisebrave.BleMsg.BaseBleMessage;
+import link_work.wisebrave.BleMsg.BleCmd03_getPower;
+import link_work.wisebrave.BleMsg.BleCmd05_RemindOnOff;
+import link_work.wisebrave.BleMsg.BleCmd06_getData;
+import link_work.wisebrave.BleMsg.BleCmd20_syncTime;
+
 public class BleNotifyParse extends BaseBleMessage {
 
     private static final int BUFFER_MAX_LEN = 1024;
