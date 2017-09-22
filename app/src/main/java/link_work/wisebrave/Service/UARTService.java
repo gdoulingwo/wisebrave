@@ -45,6 +45,12 @@ public class UARTService extends Service {
             "com.hch.ble.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED =
             "com.hch.ble.ACTION_GATT_DISCONNECTED";
+    /*
+    * GATT(Generic Attribute Profile)，描述了一种使用ATT的服务框架
+    * 该框架定义了服务(Server)和服务属性(characteristic)的过程(Procedure)及格式
+    * Procedure定义了characteristic的发现、读、写、通知(Notifing)、指示(Indicating)
+    * 及配置characteristic的广播
+    * */
     public final static String ACTION_GATT_SERVICES_DISCOVERED =
             "com.hch.ble.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE =

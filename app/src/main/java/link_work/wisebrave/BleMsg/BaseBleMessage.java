@@ -57,7 +57,7 @@ public abstract class BaseBleMessage {
         send[2] = (byte) (msg_data_len & 0xff);
         // 数据域
         send[3] = (byte) ((msg_data_len >> 8) & 0xff);
-        // 如果数据域不为空且长度不为0，就开始获取数据域的内容
+        // 如果数据域不为空且长度不为0，就开始设置数据域的内容
         if ((msg_data_len != 0) && (msg_data != null)) {
             for (i = 0; i < msg_data_len; i++) {
                 send[4 + i] = msg_data[i];

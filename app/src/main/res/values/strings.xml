@@ -88,6 +88,7 @@
     <string name="msg">短信：</string>
     <string name="heart_rate">心率：</string>
     <string name="heart_rate_test">心率测试</string>
+    <string name="info">信息：</string>
 
     <string-array name="sensor_interface">
         <item>None</item>
