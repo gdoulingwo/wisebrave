@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package link_work.wisebrave;
+package link_work.wisebrave.Service;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -414,7 +414,7 @@ public class UARTService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        UARTService getService() {
+        public UARTService getService() {
             return UARTService.this;
         }
     }

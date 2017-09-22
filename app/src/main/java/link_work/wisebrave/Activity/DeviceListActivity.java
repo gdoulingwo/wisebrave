@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package link_work.wisebrave;
+package link_work.wisebrave.Activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -23,7 +23,6 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -48,16 +47,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import link_work.wisebrave.R;
+
 public class DeviceListActivity extends Activity {
     public static final String TAG = "DeviceListActivity";
     private static final long SCAN_PERIOD = 10000; //10 seconds
     List<BluetoothDevice> deviceList;
     Map<String, Integer> devRssiValues;
     private BluetoothAdapter mBluetoothAdapter;
-    // private BluetoothAdapter mBtAdapter;
     private TextView mEmptyList;
     private DeviceAdapter deviceAdapter;
-    private ServiceConnection onService = null;
     private Handler mHandler;
     private boolean mScanning;
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
@@ -84,7 +83,6 @@ public class DeviceListActivity extends Activity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            BluetoothDevice device = deviceList.get(position);
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
             Bundle b = new Bundle();
@@ -145,9 +143,9 @@ public class DeviceListActivity extends Activity {
     private void populateList() {
         /* Initialize device list container */
         Log.d(TAG, "populateList");
-        deviceList = new ArrayList<BluetoothDevice>();
+        deviceList = new ArrayList<>();
         deviceAdapter = new DeviceAdapter(this, deviceList);
-        devRssiValues = new HashMap<String, Integer>();
+        devRssiValues = new HashMap<>();
 
         ListView newDevicesListView = findViewById(R.id.new_devices);
         newDevicesListView.setAdapter(deviceAdapter);
@@ -232,16 +230,12 @@ public class DeviceListActivity extends Activity {
         scanLeDevice(false);
     }
 
-    private void showMessage(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    class DeviceAdapter extends BaseAdapter {
+    private class DeviceAdapter extends BaseAdapter {
         Context context;
         List<BluetoothDevice> devices;
         LayoutInflater inflater;
 
-        public DeviceAdapter(Context context, List<BluetoothDevice> devices) {
+        DeviceAdapter(Context context, List<BluetoothDevice> devices) {
             this.context = context;
             inflater = LayoutInflater.from(context);
             this.devices = devices;

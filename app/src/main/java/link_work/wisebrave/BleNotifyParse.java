@@ -2,12 +2,16 @@ package link_work.wisebrave;
 
 import android.util.Log;
 
+import link_work.wisebrave.Activity.MainActivity;
 import link_work.wisebrave.BleMsg.BaseBleMessage;
 import link_work.wisebrave.BleMsg.BleCmd03_getPower;
 import link_work.wisebrave.BleMsg.BleCmd05_RemindOnOff;
 import link_work.wisebrave.BleMsg.BleCmd06_getData;
 import link_work.wisebrave.BleMsg.BleCmd20_syncTime;
 
+/*
+* 通知
+* */
 public class BleNotifyParse extends BaseBleMessage {
 
     private static final int BUFFER_MAX_LEN = 1024;
@@ -18,6 +22,9 @@ public class BleNotifyParse extends BaseBleMessage {
     private int bufferRear = 0;  //队列头
     private int bufferLen = 0;  //队列头
 
+    /*
+    * 单例模式
+    * */
     public static BleNotifyParse getInstance() {
         if (mBleNotifyParse == null) {
             mBleNotifyParse = new BleNotifyParse();
@@ -25,21 +32,21 @@ public class BleNotifyParse extends BaseBleMessage {
         return mBleNotifyParse;
     }
 
-    public void doParse(demo hrDK, byte[] notifyData) {
+    public void doParse(MainActivity hrDK, byte[] notifyData) {
         //synchronized (mNotifyLock) {
         l_doParse(hrDK, notifyData);
         //}
     }
 
-    private void l_doParse(demo hrDK, byte[] notifyData) {
+    private void l_doParse(MainActivity hrDK, byte[] notifyData) {
         // 加入循环队列
         Log.d(BaseBleMessage.BASE_TAG, "notify: " + BaseBleMessage.byteArrHexToString(notifyData));
-        for (int i = 0; i < notifyData.length; i++) {
+        for (byte aNotifyData : notifyData) {
             if (bufferLen >= BUFFER_MAX_LEN) {
                 bufferRear = (bufferRear + 1) % BUFFER_MAX_LEN;
                 bufferLen--;
             }
-            buffer[bufferFront] = notifyData[i];
+            buffer[bufferFront] = aNotifyData;
             bufferFront = (bufferFront + 1) % BUFFER_MAX_LEN;
             bufferLen++;
         }
@@ -66,8 +73,8 @@ public class BleNotifyParse extends BaseBleMessage {
                 case 1:
                     bufferTmp[notifyIndex++] = buffer[pos];
                     if (notifyIndex >= 4) {
-                        msgLen = (int) (0xff & bufferTmp[2]);
-                        msgLen = msgLen + (int) ((0x00ff & bufferTmp[3]) << 8);
+                        msgLen = 0xff & bufferTmp[2];
+                        msgLen = msgLen + ((0x00ff & bufferTmp[3]) << 8);
                         if (msgLen > 256) {
                             step = 0;
                             bufferRear = (bufferRear + 1) % BUFFER_MAX_LEN;
@@ -93,7 +100,6 @@ public class BleNotifyParse extends BaseBleMessage {
                         }
                         step = 0;
                     }
-
                     break;
                 default:
                     break;
@@ -101,15 +107,13 @@ public class BleNotifyParse extends BaseBleMessage {
         }
     }
 
-    private boolean Comm_Handle(demo hrDK, byte[] notifyData, int dataLength) {
+    private boolean Comm_Handle(MainActivity hrDK, byte[] notifyData, int dataLength) {
 
         //int ret = -1;
         byte[] ret = null;
 
         byte[] frame = new byte[dataLength];
-        for (int i = 0; i < dataLength; i++) {
-            frame[i] = notifyData[i];
-        }
+        System.arraycopy(notifyData, 0, frame, 0, dataLength);
 
         Log.d(BaseBleMessage.BASE_TAG, "rec: " + BaseBleMessage.byteArrHexToString(frame));
         //byte head = notifyData[0];
@@ -121,9 +125,7 @@ public class BleNotifyParse extends BaseBleMessage {
         }
 
         byte[] Data = new byte[dataLen];
-        for (int i = 0; i < dataLen; i++) {
-            Data[i] = frame[i + 4];
-        }
+        System.arraycopy(frame, 4, Data, 0, dataLen);
         //notifyData = theData;
 
         if ((cmd & 0x80) == 0x80) {
@@ -153,7 +155,7 @@ public class BleNotifyParse extends BaseBleMessage {
         return true;
     }
 
-    int bytes2Char(byte[] data, int offset) {
+    private int bytes2Char(byte[] data, int offset) {
         int va = data[offset] & 0xff;
         int vb = (data[offset + 1] << 8) & 0xffff;
         return va + vb;

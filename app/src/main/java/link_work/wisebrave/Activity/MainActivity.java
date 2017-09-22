@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package link_work.wisebrave;
+package link_work.wisebrave.Activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -44,12 +44,18 @@ import android.widget.ToggleButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import link_work.wisebrave.BleMsg.BaseBleMessage;
 import link_work.wisebrave.BleMsg.BleCmd03_getPower;
 import link_work.wisebrave.BleMsg.BleCmd05_RemindOnOff;
+import link_work.wisebrave.BleMsg.BleCmd06_getData;
 import link_work.wisebrave.BleMsg.BleCmd20_syncTime;
+import link_work.wisebrave.BleNotifyParse;
+import link_work.wisebrave.Config;
+import link_work.wisebrave.R;
+import link_work.wisebrave.Service.UARTService;
 
-public class demo extends Activity implements
+public class MainActivity extends Activity implements
         RadioGroup.OnCheckedChangeListener, OnItemSelectedListener {
     public static final String TAG = "nRFUART";
     private static final int UPDATE_MESSAGE = 1001;
@@ -59,7 +65,7 @@ public class demo extends Activity implements
     private static final int UART_PROFILE_CONNECTED = 20;
     private static final int UART_PROFILE_DISCONNECTED = 21;
     private static final int STATE_OFF = 10;
-    public static demo hrDK;
+    public static MainActivity hrDK;
     public static Activity mActivity;
     final int intf_ble_uart = 1;
     public Handler mHandler;
@@ -78,23 +84,18 @@ public class demo extends Activity implements
     TextView deviceName;
     @BindView(R.id.connect_status)
     TextView connectStatus;
-    @BindView(R.id.buttonOnOff)
-    Button mButtonOnOff;
-    @BindView(R.id.buttonRtOnOff)
-    Button mButtonRtOnOff;
-    @BindView(R.id.buttonUnload)
-    Button mButtonUnload;
-    @BindView(R.id.buttonClear)
-    Button mButtonClear;
     @BindView(R.id.buttonScan)
     Button mButtonScan;
     @BindView(R.id.tv_power)
     TextView mTextPower;
     @BindView(R.id.button_power)
     Button mButtonPower;
+    @BindView(R.id.tv_heart_rate)
+    TextView heartRate;
+    @BindView(R.id.button_heart_rate)
+    Button heartBtn;
     boolean bStartHRTest = false;
     int time_flag = 0;
-    BleNotifyParse bleNotify = new BleNotifyParse();
     private Handler handler = new Handler();
     private UARTService mUARTService = null;
     private BluetoothDevice mDevice = null;
@@ -216,7 +217,7 @@ public class demo extends Activity implements
                         mTextPower.setText(strText);
                     }
                 });
-                bleNotify.doParse(demo.this, txValue);
+                BleNotifyParse.getInstance().doParse(MainActivity.this, txValue);
 //				if (txValue[0] == 6) {
 //					runOnUiThread(new Runnable() {
 //						public void run() {
@@ -239,11 +240,6 @@ public class demo extends Activity implements
                 }
                 mUARTService.close();
                 if (hr_config.isValid()) {
-                    //mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
-
-                    //Log.d(TAG, "... onActivityResultdevice.address==" + mDevice
-                    //		+ "mserviceValue" + mUARTService);
-                    //deviceName.setText(mDevice.getName());
                     connectStatus.setText(R.string.connecting);
                     //if (intf == intf_ble_uart)
                     mUARTService.connect(mDevice.getAddress());
@@ -258,8 +254,7 @@ public class demo extends Activity implements
         public void onServiceConnected(ComponentName className,
                                        IBinder rawBinder) {
             if (intf == intf_ble_uart) {
-                mUARTService = ((UARTService.LocalBinder) rawBinder)
-                        .getService();
+                mUARTService = ((UARTService.LocalBinder) rawBinder).getService();
                 Log.d(TAG, "onServiceConnected mService= " + mUARTService);
                 if (!mUARTService.initialize()) {
                     Log.e(TAG, "Unable to initialize Bluetooth");
@@ -301,9 +296,8 @@ public class demo extends Activity implements
         setContentView(R.layout.main);
         ButterKnife.bind(this);
 
-        hr_config = new Config(demo.this);
+        hr_config = new Config(MainActivity.this);
         service_init();
-        setButtonEnable(false);
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBtAdapter == null) {
@@ -333,7 +327,6 @@ public class demo extends Activity implements
         if (hr_config.isValid()) {
             bStartHRTest = true;
             mButtonScan.setText(R.string.stop);
-            setButtonEnable(true);
 
             mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(hr_config.getAddr());
 
@@ -353,7 +346,7 @@ public class demo extends Activity implements
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case UPDATE_MESSAGE:
-                        deviceName.setText("HR :" + iHR + "(" + cur_HR + ")");
+                        // deviceName.setText("HR :" + iHR + "(" + cur_HR + ")");
                         break;
                 }
                 super.handleMessage(msg);
@@ -377,30 +370,6 @@ public class demo extends Activity implements
             }
         });
 
-        mButtonOnOff.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
-        mButtonRtOnOff.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
-        mButtonUnload.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
-        mButtonClear.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
         mButtonScan.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -408,12 +377,10 @@ public class demo extends Activity implements
                 bStartHRTest = !bStartHRTest;
                 if (bStartHRTest) {
                     mButtonScan.setText(R.string.stop);
-                    setButtonEnable(true);
-                    Intent newIntent = new Intent(demo.this, DeviceListActivity.class);
+                    Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                     startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                 } else {
                     // Disconnect button pressed
-                    setButtonEnable(false);
                     mButtonScan.setText(R.string.start);
                     hr_config.clear_config();
                     //connectStatus.setText("");
@@ -515,6 +482,9 @@ public class demo extends Activity implements
 
     }
 
+    /*
+    * 设置文本显示的内容
+    * */
     public void setTx_data(byte[] tx_data) {
         if (tx_data == null) {
             return;
@@ -650,11 +620,9 @@ public class demo extends Activity implements
 
     }
 
-    private void setButtonEnable(boolean enable) {
-        mButtonOnOff.setEnabled(enable);
-        mButtonRtOnOff.setEnabled(enable);
-        mButtonUnload.setEnabled(enable);
-        mButtonClear.setEnabled(enable);
+    @OnClick(R.id.button_heart_rate)
+    void testHeard() {
+        BleCmd06_getData getData = new BleCmd06_getData();
+        getData.onHR();
     }
-
 }

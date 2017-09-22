@@ -2,7 +2,7 @@ package link_work.wisebrave.BleMsg;
 
 import android.util.Log;
 
-import link_work.wisebrave.demo;
+import link_work.wisebrave.Activity.MainActivity;
 
 
 public class BleCmd05_RemindOnOff extends BaseBleMessage {
@@ -96,15 +96,15 @@ public class BleCmd05_RemindOnOff extends BaseBleMessage {
         switch (type) {
             case REMIND_TYPE_LOST:
                 Log.d("BEL_status", "===========防丢状态：" + isOpened);
-                demo.hrDK.mToggleButtonLose.setChecked(isOpened);
+                MainActivity.hrDK.mToggleButtonLose.setChecked(isOpened);
                 break;
             case REMIND_TYPE_SMS:
                 Log.d("BEL_status", "===========短信状态：" + isOpened);
-                demo.hrDK.mToggleButtonSms.setChecked(isOpened);
+                MainActivity.hrDK.mToggleButtonSms.setChecked(isOpened);
                 break;
             case REMIND_TYPE_PHONE:
                 Log.d("BEL_status", "===========电话状态：" + isOpened);
-                demo.hrDK.mToggleButtonCall.setChecked(isOpened);
+                MainActivity.hrDK.mToggleButtonCall.setChecked(isOpened);
                 break;
             default:
                 break;

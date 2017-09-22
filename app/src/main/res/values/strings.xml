@@ -61,7 +61,7 @@
     <string name="popup_yes">YES</string>
     <string name="popup_no">NO</string>
     <string name="ble_not_supported">Bluetooth Low Energy not supported</string>
-    <string name="scan">Scan</string>
+    <string name="scan">扫描手环设备</string>
     <string name="cancel">Cancel</string>
      <!--  DeviceListActivityBT2 -->
     <string name="scanning_bt2">scanning for devices…</string>
@@ -86,6 +86,8 @@
     <string name="anti_thief">防丢：</string>
     <string name="phone">电话：</string>
     <string name="msg">短信：</string>
+    <string name="heart_rate">心率：</string>
+    <string name="heart_rate_test">心率测试</string>
 
     <string-array name="sensor_interface">
         <item>None</item>

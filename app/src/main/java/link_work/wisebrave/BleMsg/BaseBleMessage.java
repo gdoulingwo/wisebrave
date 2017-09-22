@@ -7,7 +7,7 @@ import android.util.Log;
 public abstract class BaseBleMessage {
 //	2.1、一个完整的数据包格式如下（一对“xx”为一个字节的hex码）:
 //		 68 	xx		 xxxx		  xx…		xx	    16
-//		包头	      功能码	数据长度	         数据域           检验码      尾帧
+//		包头	   功能码	数据长度	     数据域    检验码    尾帧
 
     public static final String BASE_TAG = "BLE_COM";
     private byte msg_head = 0x68;
@@ -73,7 +73,10 @@ public abstract class BaseBleMessage {
         return send;
     }
 
-    public byte[] setMessageByteData(byte cmd, byte[] data, int len) {
+    /*
+    * 处理数据
+    * */
+    byte[] setMessageByteData(byte cmd, byte[] data, int len) {
         msg_cmd = cmd;
 
         if (data != null) {

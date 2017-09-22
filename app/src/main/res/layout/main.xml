@@ -6,7 +6,7 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="wrap_content"
         android:stretchColumns="*">
 
         <TableRow
@@ -37,6 +37,17 @@
 
         </TableRow>
 
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/buttonScan"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/scan" />
+        </TableRow>
+
     </TableLayout>
 
     <LinearLayout
@@ -59,97 +70,69 @@
             android:layout_height="wrap_content"
             android:text="@string/read_battery" />
 
-
     </LinearLayout>
 
-    <TableLayout
-        android:layout_width="wrap_content"
-        android:layout_height="102dp"
-        android:stretchColumns="*">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/buttonOnOff"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/on" />
-
-            <Button
-                android:id="@+id/buttonRtOnOff"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/onoff" />
-
-            <Button
-                android:id="@+id/buttonUnload"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/upload" />
-
-            <Button
-                android:id="@+id/buttonClear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/clear" />
-
-        </TableRow>
+        <TextView
+            android:id="@+id/tv_heart_rate"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/heart_rate"
+            android:textSize="18sp" />
 
         <Button
-            android:id="@+id/buttonScan"
-            android:layout_width="match_parent"
+            android:id="@+id/button_heart_rate"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/scan" />
+            android:text="@string/heart_rate_test" />
 
-    </TableLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dip"
+            android:text="@string/anti_thief" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dip"
-                android:text="@string/anti_thief" />
+        <ToggleButton
+            android:id="@+id/toggleButtonLose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-            <ToggleButton
-                android:id="@+id/toggleButtonLose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dip"
+            android:text="@string/phone" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dip"
-                android:text="@string/phone" />
+        <ToggleButton
+            android:id="@+id/toggleButtonCall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-            <ToggleButton
-                android:id="@+id/toggleButtonCall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dip"
+            android:text="@string/msg" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dip"
-                android:text="@string/msg" />
-
-            <ToggleButton
-                android:id="@+id/toggleButtonSms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
+        <ToggleButton
+            android:id="@+id/toggleButtonSms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
