@@ -48,7 +48,6 @@ import link_work.wisebrave.BleMsg.BaseBleMessage;
 import link_work.wisebrave.BleMsg.BleCmd03_getPower;
 import link_work.wisebrave.BleMsg.BleCmd05_RemindOnOff;
 import link_work.wisebrave.BleMsg.BleCmd06_getData;
-import link_work.wisebrave.BleMsg.BleCmd20_syncTime;
 import link_work.wisebrave.BleNotifyParse;
 import link_work.wisebrave.Config;
 import link_work.wisebrave.R;
@@ -234,7 +233,7 @@ public class MainActivity extends Activity implements
                 } else {
                     if (hr_config.isValid()) {
                         if (mBtAdapter.isEnabled()) {
-                            mUARTService.connect(hr_config.getAddr());
+                            mUARTService.connect(hr_config.getAddress());
                         }
                     }
                 }
@@ -296,7 +295,7 @@ public class MainActivity extends Activity implements
             bStartHRTest = true;
             mButtonScan.setText(R.string.stop);
 
-            mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(hr_config.getAddr());
+            mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(hr_config.getAddress());
 
             Log.d(TAG, "... onActivityResultdevice.address==" + mDevice
                     + "mserviceValue" + mUARTService);

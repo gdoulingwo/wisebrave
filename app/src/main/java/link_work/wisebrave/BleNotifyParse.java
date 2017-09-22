@@ -18,7 +18,7 @@ public class BleNotifyParse extends BaseBleMessage {
     private static BleNotifyParse mBleNotifyParse;
     private byte[] buffer = new byte[BUFFER_MAX_LEN];
     private byte[] bufferTmp = new byte[BUFFER_MAX_LEN];
-    private int bufferFront = 0;    //队列尾
+    private int bufferFront = 0;   //队列尾
     private int bufferRear = 0;  //队列头
     private int bufferLen = 0;  //队列头
 
@@ -38,31 +38,45 @@ public class BleNotifyParse extends BaseBleMessage {
         //}
     }
 
+    /**
+     * 数据解析，采用循环队列对长连接数据进行处理
+     *
+     * @param hrDK       显示界面
+     * @param notifyData 底层数据
+     */
     private void l_doParse(MainActivity hrDK, byte[] notifyData) {
         // 加入循环队列
         Log.d(BaseBleMessage.BASE_TAG, "notify: " + BaseBleMessage.byteArrHexToString(notifyData));
+        // 从底层数据数组中逐个取出来处理
         for (byte aNotifyData : notifyData) {
             if (bufferLen >= BUFFER_MAX_LEN) {
+                // 找到队列头
                 bufferRear = (bufferRear + 1) % BUFFER_MAX_LEN;
                 bufferLen--;
             }
             buffer[bufferFront] = aNotifyData;
+            // 队列尾
             bufferFront = (bufferFront + 1) % BUFFER_MAX_LEN;
             bufferLen++;
         }
 
+        // 通知索引
         int notifyIndex = 0;
         int msgLen = 0;
         int pos;
+        // 分段解析包的段数
         int step = 0;
 
         for (int read = 0; read < bufferLen; ) {
             pos = (bufferRear + read) % BUFFER_MAX_LEN;
             read++;
+            // 分段拆包
             switch (step) {
                 case 0:
+                    // 如果是数据头的话，
                     if (buffer[pos] == 0x68) {
                         notifyIndex = 0;
+                        // 临时数组
                         bufferTmp[notifyIndex++] = buffer[pos];
                         bufferRear = pos;
                         bufferLen = bufferLen - read + 1;
@@ -71,10 +85,13 @@ public class BleNotifyParse extends BaseBleMessage {
                     }
                     break;
                 case 1:
+                    //
                     bufferTmp[notifyIndex++] = buffer[pos];
                     if (notifyIndex >= 4) {
+                        // 获取数据域的数据长度
                         msgLen = 0xff & bufferTmp[2];
                         msgLen = msgLen + ((0x00ff & bufferTmp[3]) << 8);
+                        // 如果数据域大小超出256的话，就直接抛弃
                         if (msgLen > 256) {
                             step = 0;
                             bufferRear = (bufferRear + 1) % BUFFER_MAX_LEN;
@@ -107,6 +124,13 @@ public class BleNotifyParse extends BaseBleMessage {
         }
     }
 
+    /**
+     * 控制码识别
+     *
+     * @param hrDK       Activity
+     * @param notifyData 底层数据
+     * @param dataLength 底层数据长度
+     */
     private boolean Comm_Handle(MainActivity hrDK, byte[] notifyData, int dataLength) {
 
         //int ret = -1;
