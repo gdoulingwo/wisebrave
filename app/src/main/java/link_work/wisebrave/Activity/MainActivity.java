@@ -184,6 +184,7 @@ public class MainActivity extends Activity implements
                         String strText = "电量：";
                         Log.e("test", Arrays.toString(txValue));
                         strText += BaseBleMessage.byteArrHexToString(txValue);
+
                         mTextPower.setText(strText);
                     }
                 });

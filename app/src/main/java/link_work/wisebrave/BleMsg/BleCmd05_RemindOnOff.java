@@ -25,6 +25,12 @@ public class BleCmd05_RemindOnOff extends BaseBleMessage {
     * */
     public static final int REMIND_TYPE_PHONE = 3;
 
+    /**
+     * 切换提醒功能
+     *
+     * @param remindType 提醒的类型
+     * @param remindOnOff 是否开启提醒
+     * */
     public byte[] switchRemind(int remindType, boolean remindOnOff) {
         byte[] data = new byte[3];
         data[0] = 0x00;
@@ -55,6 +61,7 @@ public class BleCmd05_RemindOnOff extends BaseBleMessage {
     }
 
     /**
+     * 读取提醒功能的功能码
      * @param type 1：防丢提醒 2：短信提醒 3：来电提醒
      * @return 0：关  1：开
      */

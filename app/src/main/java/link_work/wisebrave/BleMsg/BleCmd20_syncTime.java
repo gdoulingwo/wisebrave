@@ -25,16 +25,15 @@ public class BleCmd20_syncTime extends BaseBleMessage {
 
     //6820  0800 00 00 00 00 55 72 6e bf 8416
     // 6820 0400 55 72 6f ac 6e16
-
     public byte[] syncCurrentTime() {
-        long time_sec, time_msec;
+        long time_sec, time_mse;
         TimeZone timeZone;
         byte[] time = new byte[4];
         Calendar now = Calendar.getInstance();
 
         timeZone = now.getTimeZone();
-        time_msec = System.currentTimeMillis() + timeZone.getRawOffset();
-        time_sec = time_msec / 1000;
+        time_mse = System.currentTimeMillis() + timeZone.getRawOffset();
+        time_sec = time_mse / 1000;
 
         time[0] = (byte) (time_sec & 0xff);
         time[1] = (byte) ((time_sec >> 8) & 0xff);
