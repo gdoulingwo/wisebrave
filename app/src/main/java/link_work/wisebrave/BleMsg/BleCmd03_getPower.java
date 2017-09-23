@@ -18,7 +18,7 @@ public class BleCmd03_getPower extends BaseBleMessage {
     public static byte mTheCmd = 0x03;
 
     /**
-     * 获取电量的数据包
+     * 返回生成的获取电量的数据包
      *
      * @return 返回电量的底层数据包
      */

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2013 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +62,7 @@
     <string name="ble_not_supported">Bluetooth Low Energy not supported</string>
     <string name="scan">扫描手环设备</string>
     <string name="cancel">Cancel</string>
-     <!--  DeviceListActivityBT2 -->
+    <!--  DeviceListActivityBT2 -->
     <string name="scanning_bt2">scanning for devices…</string>
     <string name="select_device_bt2">select a device to connect</string>
     <string name="none_paired">No devices have been paired</string>
@@ -100,4 +99,16 @@
         <item>ODR - 160</item>
         <item>ODR - 200</item>
     </string-array>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
 </resources>

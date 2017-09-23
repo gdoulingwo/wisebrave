@@ -26,6 +26,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -48,10 +49,10 @@ import link_work.wisebrave.BleMsg.BaseBleMessage;
 import link_work.wisebrave.BleMsg.BleCmd03_getPower;
 import link_work.wisebrave.BleMsg.BleCmd05_RemindOnOff;
 import link_work.wisebrave.BleMsg.BleCmd06_getData;
-import link_work.wisebrave.BleNotifyParse;
-import link_work.wisebrave.Config;
 import link_work.wisebrave.R;
 import link_work.wisebrave.Service.UARTService;
+import link_work.wisebrave.Util.BleNotifyParse;
+import link_work.wisebrave.Util.Config;
 
 public class MainActivity extends Activity implements
         RadioGroup.OnCheckedChangeListener, OnItemSelectedListener {
@@ -91,8 +92,6 @@ public class MainActivity extends Activity implements
     TextView heartRate;
     @BindView(R.id.button_heart_rate)
     Button heartBtn;
-    @BindView(R.id.info)
-    TextView info;
     boolean bStartHRTest = false;
     int time_flag = 0;
     private byte[] tx_data = new byte[512];
@@ -101,12 +100,15 @@ public class MainActivity extends Activity implements
     private int tx_data_rear = 0;
     private UARTService mUARTService = null;
     private BluetoothDevice mDevice = null;
+    /**
+     * 接受数据
+     */
     private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
 
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            // *********************//
+            // *********连接动作发生的时候************//
             if (action.equals(UARTService.ACTION_GATT_CONNECTED)) {
                 runOnUiThread(new Runnable() {
                     public void run() {
@@ -120,7 +122,7 @@ public class MainActivity extends Activity implements
                 });
             }
 
-            // *********************//
+            // **********当设备断开连接的时候***********//
             if (action.equals(UARTService.ACTION_GATT_DISCONNECTED)) {
                 runOnUiThread(new Runnable() {
                     public void run() {
@@ -129,15 +131,17 @@ public class MainActivity extends Activity implements
                         mUARTService.close();
                         if (hr_config.isValid()) {
                             connectStatus.setText(R.string.connecting);
-                            //if (intf == intf_ble_uart)
-                            mUARTService.connect(mDevice.getAddress());
+                            // 如果intf等于原来的intf的话，就重新连接
+                            if (intf == intf_ble_uart) {
+                                mUARTService.connect(mDevice.getAddress());
+                            }
                         }
 
                     }
                 });
             }
 
-            // *********************//
+            // **********当扫描到设备的时候***********//
             if (action.equals(UARTService.ACTION_GATT_SERVICES_DISCOVERED)) {
                 mUARTService.enableTXNotification();
                 try {
@@ -146,33 +150,33 @@ public class MainActivity extends Activity implements
                     e.printStackTrace();
                 }
 //                BleCmd20_syncTime syncTime = new BleCmd20_syncTime();
-//                setTx_data(syncTime.syncCurrentTime());
+//                initSendData(syncTime.syncCurrentTime());
 //                try {
 //                    Thread.sleep(400);
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
 //                BleCmd05_RemindOnOff remindOnOff = new BleCmd05_RemindOnOff();
-//                setTx_data(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_LOST));
+//                initSendData(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_LOST));
 //
 //                try {
 //                    Thread.sleep(400);
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
-//                setTx_data(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_SMS));
+//                initSendData(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_SMS));
 //
 //                try {
 //                    Thread.sleep(400);
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
-//                setTx_data(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_PHONE));
+//                initSendData(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_PHONE));
 //
 //                BleCmd03_getPower getPower = new BleCmd03_getPower();
-//                setTx_data(getPower.getPower());
+//                initSendData(getPower.getPower());
             }
-            // *********************//
+            // ***********当数据可用的时候**********//
             if (action.equals(UARTService.ACTION_DATA_AVAILABLE)) {
 
                 final byte[] txValue = intent.getByteArrayExtra(UARTService.EXTRA_DATA);
@@ -183,7 +187,7 @@ public class MainActivity extends Activity implements
                         String strText = "电量：";
                         Log.e("test", Arrays.toString(txValue));
                         strText += BaseBleMessage.byteArrHexToString(txValue);
-
+                        Log.e("test", strText);
                         mTextPower.setText(strText);
                     }
                 });
@@ -199,7 +203,7 @@ public class MainActivity extends Activity implements
 //					});
 //				}
             }
-            // *********************//
+            // ***********如果设备不支持的话**********//
             if (action.equals(UARTService.DEVICE_DOES_NOT_SUPPORT)) {
                 showMessage("Device doesn't support UART. Disconnecting");
                 mUARTService.disconnect();
@@ -211,8 +215,9 @@ public class MainActivity extends Activity implements
                 mUARTService.close();
                 if (hr_config.isValid()) {
                     connectStatus.setText(R.string.connecting);
-                    //if (intf == intf_ble_uart)
-                    mUARTService.connect(mDevice.getAddress());
+                    if (intf == intf_ble_uart) {
+                        mUARTService.connect(mDevice.getAddress());
+                    }
                 }
             }
 
@@ -246,8 +251,41 @@ public class MainActivity extends Activity implements
             }
         }
     };
+    private Handler handler = new Handler();
+    // 发送数据并处理数据
+    private Runnable runnable = new Runnable() {
+        public void run() {
+            if (tx_data_len > 0) {
+                int len;
+                if (tx_data_len > 20) {
+                    len = 20;
+                } else {
+                    len = tx_data_len;
+                }
 
-    //注册广播,通过广播传递连接状态.
+                byte[] send_buf = new byte[len];
+                for (int i = 0; i < len; i++) {
+                    send_buf[i] = tx_data[tx_data_rear];
+                    tx_data_rear = (tx_data_rear + 1) % 512;
+                }
+
+                if (mUARTService != null) {
+                    mUARTService.writeRXCharacteristic(send_buf);
+                }
+                tx_data_len = tx_data_len - len;
+            }
+
+            if (tx_data_len > 0) {
+                handler.postDelayed(this, 200);
+            } else {
+                time_flag = 0;
+            }
+        }
+    };
+
+    /**
+     * 注册广播,通过广播传递连接状态.
+     */
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UARTService.ACTION_GATT_CONNECTED);  //连接远程设备
@@ -259,7 +297,7 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) { //通过蓝牙管理器得到一个参考蓝牙适配器
+    public void onCreate(Bundle savedInstanceState) { // 通过蓝牙管理器得到一个参考蓝牙适配器
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         ButterKnife.bind(this);
@@ -269,8 +307,7 @@ public class MainActivity extends Activity implements
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBtAdapter == null) {
-            Toast.makeText(this, "Bluetooth is not available",
-                    Toast.LENGTH_LONG).show();
+            showMessage("Bluetooth is not available");
             finish();
             return;
         }
@@ -395,14 +432,11 @@ public class MainActivity extends Activity implements
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(this, "Bluetooth has turned on ",
-                            Toast.LENGTH_SHORT).show();
-
+                    showMessage("Bluetooth has turned on ");
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(this, "Problem in BT Turning ON ",
-                            Toast.LENGTH_SHORT).show();
+                    showMessage("Problem in BT Turning ON ");
                     //finish();
                 }
                 break;
@@ -438,7 +472,7 @@ public class MainActivity extends Activity implements
         mToggleButtonLose.setChecked(status);
         BleCmd05_RemindOnOff ctrlCmd = new BleCmd05_RemindOnOff();
         // 防丢提醒
-        setTx_data(ctrlCmd.switchRemind(BleCmd05_RemindOnOff.REMIND_TYPE_LOST, status));
+        initSendData(ctrlCmd.switchRemind(BleCmd05_RemindOnOff.REMIND_TYPE_LOST, status));
     }
 
     @OnClick(R.id.toggleButtonSms)
@@ -449,7 +483,7 @@ public class MainActivity extends Activity implements
         }
         mToggleButtonSms.setChecked(status);
         BleCmd05_RemindOnOff ctrlCmd = new BleCmd05_RemindOnOff();
-        setTx_data(ctrlCmd.switchRemind(BleCmd05_RemindOnOff.REMIND_TYPE_SMS, status));
+        initSendData(ctrlCmd.switchRemind(BleCmd05_RemindOnOff.REMIND_TYPE_SMS, status));
     }
 
     @OnClick(R.id.toggleButtonCall)
@@ -460,12 +494,14 @@ public class MainActivity extends Activity implements
         }
         mToggleButtonCall.setChecked(status);
         BleCmd05_RemindOnOff ctrlCmd = new BleCmd05_RemindOnOff();
-        setTx_data(ctrlCmd.switchRemind(BleCmd05_RemindOnOff.REMIND_TYPE_PHONE, status));
+        initSendData(ctrlCmd.switchRemind(BleCmd05_RemindOnOff.REMIND_TYPE_PHONE, status));
     }
 
     @OnClick(R.id.button_power)
     void showPower() {
-        setTx_data(new BleCmd03_getPower().getPower());
+        BleCmd03_getPower getPower = new BleCmd03_getPower();
+        Log.i(TAG, "showPower: " + getPower);
+        initSendData(getPower.getPower());
     }
 
     @OnClick(R.id.buttonScan)
@@ -506,11 +542,13 @@ public class MainActivity extends Activity implements
 //        }
     }
 
-//    public void setTx_data(byte[] bytes) {
-//        info.setText(new String(bytes));
-//    }
-
-    public void setTx_data(byte[] tx_data) {
+    /**
+     * 生成底层数据包，发送给手环。
+     *
+     * @param tx_data 底层数据包
+     */
+    public void initSendData(byte[] tx_data) {
+        Log.i("test", "initSendData 进来了");
         if (tx_data == null) {
             return;
         }
@@ -521,7 +559,7 @@ public class MainActivity extends Activity implements
         if (!mUARTService.isConnected()) {
             return;
         }
-
+        Log.i("test", "initSendData: -> 底层数据包的长度为（默认为6个）" + tx_data.length);
         for (byte aTx_data : tx_data) {
             if (tx_data_len >= 512) {
                 tx_data_rear = (tx_data_rear + 1) % 512;
@@ -531,35 +569,11 @@ public class MainActivity extends Activity implements
             tx_data_front = (tx_data_front + 1) % 512;
             tx_data_len++;
         }
+        Log.i("test", "initSendData: tx_data_rear->" + tx_data_rear);
         if (time_flag == 0) {
-            if (tx_data_len > 0) {
-                int len;
-                if (tx_data_len > 20) {
-                    len = 20;
-                } else {
-                    len = tx_data_len;
-                }
-
-                byte[] send_buf = new byte[len];
-                for (int i = 0; i < len; i++) {
-                    send_buf[i] = tx_data[tx_data_rear];
-                    tx_data_rear = (tx_data_rear + 1) % 512;
-                }
-
-                if (mUARTService != null) {
-                    mUARTService.writeRXCharacteristic(send_buf);
-                }
-                tx_data_len = tx_data_len - len;
-            }
-
-            if (tx_data_len > 0) {
-                Log.i(TAG, "setTx_data: 1111"+ Arrays.toString(tx_data));
-                info.setText(new String(tx_data));
-            } else {
-                time_flag = 0;
-            }
+            handler.postDelayed(runnable, 200);
             time_flag = 1;
         }
+        Log.i("test", "initSendData 出来了");
     }
-
 }

@@ -1,4 +1,4 @@
-package link_work.wisebrave;
+package link_work.wisebrave.Util;
 
 import android.util.Log;
 
@@ -173,7 +173,7 @@ public class BleNotifyParse extends BaseBleMessage {
         }
 
         if (ret != null) {
-            hrDK.setTx_data(ret);
+            hrDK.initSendData(ret);
         }
 
         return true;

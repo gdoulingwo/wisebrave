@@ -42,7 +42,7 @@ public abstract class BaseBleMessage {
             }
             ret += hex;
         }
-        Log.i("test", "byteArrHexToString: " + ret.toUpperCase());
+        // Log.i("test", "byteArrHexToString: " + ret.toUpperCase());
         return ret.toUpperCase();
     }
 

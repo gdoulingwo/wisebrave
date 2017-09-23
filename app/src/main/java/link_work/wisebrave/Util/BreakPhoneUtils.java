@@ -1,4 +1,4 @@
-package link_work.wisebrave;
+package link_work.wisebrave.Util;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -12,6 +12,9 @@ public class BreakPhoneUtils {
 
     private final static String TELEPHONY_SERVICE = "phone";
 
+    /**
+     * 从手机通讯簿中获取联系人的姓名
+     * */
     public static String getContactNameFromPhoneBook(Context context, String phoneNum) {
 
         String name = null;
@@ -34,6 +37,9 @@ public class BreakPhoneUtils {
         return name;
     }
 
+    /**
+     * 从手机通讯簿中获取联系人的姓名
+     * */
     public static String l_getContactNameFromPhoneBook(Context context, String phoneNum) {
         String contactName = null;
         ContentResolver cr = context.getContentResolver();

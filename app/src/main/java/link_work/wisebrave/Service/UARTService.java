@@ -140,6 +140,11 @@ public class UARTService extends Service {
         }
     };
 
+    /**
+     * 是否连接成功
+     *
+     * @return 返回连接的状态
+     */
     public boolean isConnected() {
         return mConnectionState == STATE_CONNECTED;
     }
@@ -166,7 +171,7 @@ public class UARTService extends Service {
         } else if (TX_CHAR_UUID.equals(characteristic.getUuid())) {
             intent.putExtra(EXTRA_DATA, characteristic.getValue());
         } else {
-
+            // 当不匹配的时候
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -214,10 +219,7 @@ public class UARTService extends Service {
      * Connects to the GATT server hosted on the Bluetooth LE device.
      *
      * @param address The device address of the destination device.
-     * @return Return true if the connection is initiated successfully. The connection result
-     * is reported asynchronously through the
-     * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
-     * callback.
+     * @return Return true if the connection is initiated successfully. The connection result is reported asynchronously through the {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)} callback.
      */
     public boolean connect(final String address) {
         if (mBluetoothAdapter == null || address == null) {
@@ -269,6 +271,7 @@ public class UARTService extends Service {
     /**
      * After using a given BLE device, the app must call this method to ensure resources are
      * released properly.
+     * 在使用完BEL设备的时候，这个app必须确保调用这个方法去正确的释放资源。
      */
     public void close() {
         if (mBluetoothGatt == null) {
@@ -301,13 +304,11 @@ public class UARTService extends Service {
      * @return
      */
     public void enableHRNotification() {
-        /*
         if (mBluetoothGatt == null) {
     		showMessage("mBluetoothGatt null" + mBluetoothGatt);
     		broadcastUpdate(DEVICE_DOES_NOT_SUPPORT);
     		return;
     	}
-    		*/
         BluetoothGattService HRService = mBluetoothGatt.getService(HR_SERVICE_UUID);
         if (HRService == null) {
             showMessage("HR service not found!");
@@ -357,13 +358,11 @@ public class UARTService extends Service {
      * @return
      */
     public void enableTXNotification() {
-        /*
         if (mBluetoothGatt == null) {
     		showMessage("mBluetoothGatt null" + mBluetoothGatt);
     		broadcastUpdate(DEVICE_DOES_NOT_SUPPORT);
     		return;
     	}
-    		*/
         BluetoothGattService RxService = mBluetoothGatt.getService(RX_SERVICE_UUID);
         if (RxService == null) {
             showMessage("Rx service not found!");
@@ -383,6 +382,12 @@ public class UARTService extends Service {
         mBluetoothGatt.writeDescriptor(descriptor);
     }
 
+
+    /**
+     * Write rx characteristic.
+     *
+     * @param value the value
+     */
     public void writeRXCharacteristic(byte[] value) {
         BluetoothGattService RxService = mBluetoothGatt.getService(RX_SERVICE_UUID);
         showMessage("mBluetoothGatt null" + mBluetoothGatt);
@@ -419,6 +424,9 @@ public class UARTService extends Service {
         return mBluetoothGatt.getServices();
     }
 
+    /**
+     * The type Local binder.
+     */
     public class LocalBinder extends Binder {
         public UARTService getService() {
             return UARTService.this;

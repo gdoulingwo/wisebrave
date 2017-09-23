@@ -1,4 +1,4 @@
-package link_work.wisebrave;
+package link_work.wisebrave.Util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
