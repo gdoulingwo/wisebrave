@@ -23,7 +23,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textColor="@color/colorPrimary"
-                android:textSize="36sp" />
+                android:text="@string/device_name"
+                android:textSize="24sp" />
 
         </TableRow>
 
@@ -36,7 +37,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textColor="@color/colorAccent"
-                android:textSize="36sp" />
+                android:text="@string/device_status"
+                android:textSize="24sp" />
 
         </TableRow>
 

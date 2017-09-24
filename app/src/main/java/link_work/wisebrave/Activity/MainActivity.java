@@ -163,7 +163,8 @@ public class MainActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
-
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -273,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             // Disconnect button pressed
             mButtonScan.setText(R.string.start);
-            connectStatus.setText("");
+            setConnectStatus(0);
             handleData.clearConfig();
         }
     }
@@ -295,17 +296,18 @@ public class MainActivity extends AppCompatActivity implements
         String action = event.getAction();
         // *********连接动作发生的时候************//
         if (action.equals(UARTService.ACTION_GATT_CONNECTED)) {
-            deviceName.setText(handleData.getmDevice().getName());
-            connectStatus.setText(R.string.connected);
+            String name = getString(R.string.device_name) + handleData.getmDevice().getName();
+            deviceName.setText(name);
+            setConnectStatus(R.string.connected);
             handleData.saveConfig();
         }
 
         // **********当设备断开连接的时候***********//
         if (action.equals(UARTService.ACTION_GATT_DISCONNECTED)) {
-            connectStatus.setText(R.string.disconnect);
+            setConnectStatus(R.string.disconnect);
             handleData.getmUARTService().close();
             if (handleData.isConfigValid()) {
-                connectStatus.setText(R.string.connecting);
+                setConnectStatus(R.string.connecting);
                 handleData.reconnect();
             }
         }
@@ -334,9 +336,21 @@ public class MainActivity extends AppCompatActivity implements
             handleData.sleep(100);
             handleData.getmUARTService().close();
             if (handleData.isConfigValid()) {
-                connectStatus.setText(R.string.connecting);
+                setConnectStatus(R.string.connecting);
                 handleData.reconnect();
             }
+        }
+    }
+
+    /**
+     * 设置连接的状态
+     */
+    private void setConnectStatus(int status) {
+        if (status == 0) {
+            connectStatus.setText(R.string.device_status);
+        } else {
+            String name = getString(R.string.device_status) + getString(status);
+            connectStatus.setText(name);
         }
     }
 }
