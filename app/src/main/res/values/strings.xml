@@ -15,7 +15,7 @@
 -->
 <resources>
 
-    <string name="app_name">Heart Rate Measurement</string>
+    <string name="app_name">智能手环检测APP</string>
     <string name="device">Device:</string>
     <string name="no_device">&lt;Select a device&gt;</string>
     <string name="select_device">Select a device</string>

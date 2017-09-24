@@ -19,6 +19,7 @@ import link_work.wisebrave.Service.UARTStatusChangeReceiver;
 
 /**
  * Created by wangyu on 17-9-24.
+ * 处理和硬件交互的类
  */
 
 public class HandleData {

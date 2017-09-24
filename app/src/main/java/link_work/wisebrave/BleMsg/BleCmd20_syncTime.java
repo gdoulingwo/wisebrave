@@ -25,7 +25,7 @@ public class BleCmd20_syncTime extends BaseBleMessage {
 
     //6820  0800 00 00 00 00 55 72 6e bf 8416
     // 6820 0400 55 72 6f ac 6e16
-    public byte[] syncCurrentTime() {
+    private byte[] syncCurrentTime() {
         long time_sec, time_mse;
         TimeZone timeZone;
         byte[] time = new byte[4];

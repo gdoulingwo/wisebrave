@@ -18,6 +18,7 @@ package link_work.wisebrave.Activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,7 +48,7 @@ import link_work.wisebrave.Service.UARTService;
 import link_work.wisebrave.Util.BleNotifyParse;
 import link_work.wisebrave.Util.HandleData;
 
-public class MainActivity extends Activity implements
+public class MainActivity extends AppCompatActivity implements
         RadioGroup.OnCheckedChangeListener, OnItemSelectedListener {
     public static MainActivity hrDK;
     public static Activity mActivity;
@@ -234,6 +235,7 @@ public class MainActivity extends Activity implements
             strText += BaseBleMessage.byteArrHexToString(txValue);
             Log.e("test", strText);
             mTextPower.setText(strText);
+            // 解析数据
             BleNotifyParse.getInstance().doParse(MainActivity.this, txValue);
         }
         // ***********如果设备不支持的话**********//
