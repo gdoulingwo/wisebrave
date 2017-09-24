@@ -173,7 +173,7 @@ public class BleNotifyParse extends BaseBleMessage {
         }
 
         if (ret != null) {
-            hrDK.initSendData(ret);
+            hrDK.handleData.initSendData(ret);
         }
 
         return true;
