@@ -219,6 +219,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
+            // FIXME: 2017.09.25
             int id = item.getItemId();
             Log.i("test", "onOptionsItemSelected: id" + id);
             switch (id) {
