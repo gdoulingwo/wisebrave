@@ -18,13 +18,11 @@ package link_work.wisebrave.Activity;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -40,17 +38,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import link_work.wisebrave.Bean.UARTBean;
 import link_work.wisebrave.BleMsg.BaseBleMessage;
 import link_work.wisebrave.BleMsg.BleCmd03_getPower;
 import link_work.wisebrave.BleMsg.BleCmd05_RemindOnOff;
 import link_work.wisebrave.BleMsg.BleCmd06_getData;
 import link_work.wisebrave.R;
 import link_work.wisebrave.Service.UARTService;
+import link_work.wisebrave.Service.UARTStatusChangeReceiver;
 import link_work.wisebrave.Util.BleNotifyParse;
 import link_work.wisebrave.Util.Config;
 
@@ -100,132 +104,11 @@ public class MainActivity extends Activity implements
     private int tx_data_rear = 0;
     private UARTService mUARTService = null;
     private BluetoothDevice mDevice = null;
-    /**
-     * 接受数据
-     */
-    private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
-
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            // *********连接动作发生的时候************//
-            if (action.equals(UARTService.ACTION_GATT_CONNECTED)) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Log.d(TAG, "UART_CONNECT_MSG");
-                        deviceName.setText(mDevice.getName());
-                        connectStatus.setText(R.string.connected);
-                        if (!hr_config.isValid()) {
-                            hr_config.save_config(mDevice.getName(), mDevice.getAddress());
-                        }
-                    }
-                });
-            }
-
-            // **********当设备断开连接的时候***********//
-            if (action.equals(UARTService.ACTION_GATT_DISCONNECTED)) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Log.d(TAG, "UART_DISCONNECT_MSG");
-                        connectStatus.setText(R.string.disconnect);
-                        mUARTService.close();
-                        if (hr_config.isValid()) {
-                            connectStatus.setText(R.string.connecting);
-                            // 如果intf等于原来的intf的话，就重新连接
-                            if (intf == intf_ble_uart) {
-                                mUARTService.connect(mDevice.getAddress());
-                            }
-                        }
-
-                    }
-                });
-            }
-
-            // **********当扫描到设备的时候***********//
-            if (action.equals(UARTService.ACTION_GATT_SERVICES_DISCOVERED)) {
-                mUARTService.enableTXNotification();
-                try {
-                    Thread.sleep(400);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-//                BleCmd20_syncTime syncTime = new BleCmd20_syncTime();
-//                initSendData(syncTime.syncCurrentTime());
-//                try {
-//                    Thread.sleep(400);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                BleCmd05_RemindOnOff remindOnOff = new BleCmd05_RemindOnOff();
-//                initSendData(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_LOST));
-//
-//                try {
-//                    Thread.sleep(400);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                initSendData(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_SMS));
-//
-//                try {
-//                    Thread.sleep(400);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                initSendData(remindOnOff.readRemindStatus(BleCmd05_RemindOnOff.REMIND_TYPE_PHONE));
-//
-//                BleCmd03_getPower getPower = new BleCmd03_getPower();
-//                initSendData(getPower.getPower());
-            }
-            // ***********当数据可用的时候**********//
-            if (action.equals(UARTService.ACTION_DATA_AVAILABLE)) {
-
-                final byte[] txValue = intent.getByteArrayExtra(UARTService.EXTRA_DATA);
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        String strText = "电量：";
-                        Log.e("test", Arrays.toString(txValue));
-                        strText += BaseBleMessage.byteArrHexToString(txValue);
-                        Log.e("test", strText);
-                        mTextPower.setText(strText);
-                    }
-                });
-                BleNotifyParse.getInstance().doParse(MainActivity.this, txValue);
-//				if (txValue[0] == 6) {
-//					runOnUiThread(new Runnable() {
-//						public void run() {
-//							try {
-//							} catch (Exception e) {
-//								Log.e(TAG, e.toString());
-//							}
-//						}
-//					});
-//				}
-            }
-            // ***********如果设备不支持的话**********//
-            if (action.equals(UARTService.DEVICE_DOES_NOT_SUPPORT)) {
-                showMessage("Device doesn't support UART. Disconnecting");
-                mUARTService.disconnect();
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                mUARTService.close();
-                if (hr_config.isValid()) {
-                    connectStatus.setText(R.string.connecting);
-                    if (intf == intf_ble_uart) {
-                        mUARTService.connect(mDevice.getAddress());
-                    }
-                }
-            }
-
-        }
-    };
     private BluetoothAdapter mBtAdapter = null;
-    // UART service connected/disconnected
-    // 通用异步收发传输器， 一对一，以位为单位发送。
+    /**
+     * UART service connected/disconnected
+     * 通用异步收发传输器， 一对一，以位为单位发送。
+     */
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className,
                                        IBinder rawBinder) {
@@ -282,6 +165,7 @@ public class MainActivity extends Activity implements
             }
         }
     };
+    private UARTStatusChangeReceiver uartStatusChangeReceiver = new UARTStatusChangeReceiver();
 
     /**
      * 注册广播,通过广播传递连接状态.
@@ -372,7 +256,7 @@ public class MainActivity extends Activity implements
         Intent bindIntent = new Intent(this, UARTService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
+                uartStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
     @Override
@@ -380,8 +264,7 @@ public class MainActivity extends Activity implements
         super.onDestroy();
         this.mWakeLock.release();
         try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(
-                    UARTStatusChangeReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(uartStatusChangeReceiver);
         } catch (Exception ignore) {
             Log.e(TAG, ignore.toString());
         }
@@ -395,11 +278,6 @@ public class MainActivity extends Activity implements
             mUARTService.stopSelf();
             mUARTService = null;
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     /*
@@ -500,7 +378,7 @@ public class MainActivity extends Activity implements
     @OnClick(R.id.button_power)
     void showPower() {
         BleCmd03_getPower getPower = new BleCmd03_getPower();
-        Log.i(TAG, "showPower: " + getPower);
+        Log.i("test", "showPower: " + Arrays.toString(getPower.getPower()));
         initSendData(getPower.getPower());
     }
 
@@ -517,29 +395,6 @@ public class MainActivity extends Activity implements
             hr_config.clear_config();
             connectStatus.setText("");
         }
-
-//        if (intf == intf_ble_uart) {
-//            if (bStartHRTest) {
-//                // Connect button pressed, open DeviceListActivity
-//                // class, with popup windows that scan for devices
-//                try {
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            } else {
-//                // Disconnect button pressed
-//                try {
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//                if (mDevice != null) {
-//                    mUARTService.disconnect();
-//                }
-//            }
-//        }
     }
 
     /**
@@ -575,5 +430,83 @@ public class MainActivity extends Activity implements
             time_flag = 1;
         }
         Log.i("test", "initSendData 出来了");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(UARTBean event) {
+        String action = event.getAction();
+        // *********连接动作发生的时候************//
+        if (action.equals(UARTService.ACTION_GATT_CONNECTED)) {
+            Log.d(TAG, "UART_CONNECT_MSG");
+            deviceName.setText(mDevice.getName());
+            connectStatus.setText(R.string.connected);
+            if (!hr_config.isValid()) {
+                hr_config.save_config(mDevice.getName(), mDevice.getAddress());
+            }
+        }
+
+        // **********当设备断开连接的时候***********//
+        if (action.equals(UARTService.ACTION_GATT_DISCONNECTED)) {
+            Log.d(TAG, "UART_DISCONNECT_MSG");
+            connectStatus.setText(R.string.disconnect);
+            mUARTService.close();
+            if (hr_config.isValid()) {
+                connectStatus.setText(R.string.connecting);
+                // 如果intf等于原来的intf的话，就重新连接
+                if (intf == intf_ble_uart) {
+                    mUARTService.connect(mDevice.getAddress());
+                }
+            }
+        }
+
+        // **********当扫描到设备的时候***********//
+        if (action.equals(UARTService.ACTION_GATT_SERVICES_DISCOVERED)) {
+            mUARTService.enableTXNotification();
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        // ***********当数据可用的时候**********//
+        if (action.equals(UARTService.ACTION_DATA_AVAILABLE)) {
+
+            final byte[] txValue = event.getData();
+            String strText = "电量：";
+            Log.e("test", Arrays.toString(txValue));
+            strText += BaseBleMessage.byteArrHexToString(txValue);
+            Log.e("test", strText);
+            mTextPower.setText(strText);
+            BleNotifyParse.getInstance().doParse(MainActivity.this, txValue);
+        }
+        // ***********如果设备不支持的话**********//
+        if (action.equals(UARTService.DEVICE_DOES_NOT_SUPPORT)) {
+            showMessage("Device doesn't support UART. Disconnecting");
+            mUARTService.disconnect();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            mUARTService.close();
+            if (hr_config.isValid()) {
+                connectStatus.setText(R.string.connecting);
+                if (intf == intf_ble_uart) {
+                    mUARTService.connect(mDevice.getAddress());
+                }
+            }
+        }
     }
 }

@@ -41,6 +41,11 @@
             android:name=".Activity.DeviceListActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Dialog" />
+
+        <service
+            android:name=".Service.UARTStatusChangeReceiver"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

@@ -31,7 +31,7 @@ public class BleCmd03_getPower extends BaseBleMessage {
      *
      * @param notifyData 底层数据
      * @param dataLen    底层数据包的长度
-     * @return
+     * @return 返回字节
      */
     public byte[] dealBleResponse(byte[] notifyData, int dataLen) {
         int power;
